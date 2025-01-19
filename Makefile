@@ -15,7 +15,7 @@ build_floppy_image: collect_binaries
 	# MACOS - Comment out
 	cp ./bootloader/backup/empty_floppy_fat12.img $(BIN)/$(TARGET).img
 
-	echo $(BIN)/*.bin > $(BIN)/$(TARGET).bin
+	cat $(BIN)/*.bin > $(BIN)/$(TARGET).bin
 	dd if=$(BIN)/$(TARGET).bin of=$(BIN)/$(TARGET).img conv=notrunc
 
 collect_binaries: build_modules
