@@ -1,0 +1,4 @@
+*.swp
+/bin
+bootloader/bin
+kernel/bin
