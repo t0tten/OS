@@ -10,8 +10,11 @@ TARGET_IMG=$(TARGET).img
 all: $(BIN)/$(TARGET_IMG)
 
 $(BIN)/$(TARGET_IMG):$(BIN)/$(TARGET_BIN)
-	cp ./$(BIN)/$(TARGET_BIN) ./$(BIN)/$(TARGET_IMG)
-	truncate -s 1440k ./$(BIN)/$(TARGET_IMG)
+	#dd if=/dev/zero of=./$(BIN)/$(TARGET_IMG) bs=512 count=2880 # Floppy disk 1,4MB
+	#newfs_msdos -F 12 -v "NBOS" ./$(BIN)/$(TARGET_IMG)
+	#mkfs.fat -F 12 -n "NBOS" ./$(BIN)/$(TARGET_IMG)
+	cp ./backup/empty_floppy_fat12.img ./$(BIN)/$(TARGET_IMG)
+	dd if=./$(BIN)/$(TARGET_BIN) of=./$(BIN)/$(TARGET_IMG)
 
 $(BIN)/$(TARGET_BIN):
 	if [ ! -d ./$(BIN) ]; then mkdir ./$(BIN); fi

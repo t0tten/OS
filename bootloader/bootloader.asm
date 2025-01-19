@@ -1,54 +1,55 @@
-[org 0x7C00]
+[org 0x7c00]
 
-mov ah, 0x0e
+%define ENDL 0x0d, 0x0a 
 
-mov bx, new_line
-call print_characters
+start:
+	jmp main
 
-mov bx, message
-call print_characters
+;
+; Prints a character to the screen
+; params:
+;  - ds:si: ponts to string
+; 
+puts:
+	; save registers we will modify
+	push si
+	push ax
 
-mov bx, new_line
-call print_characters
-
-mov bx, line2
-call print_characters
-
-mov bx, new_line
-call print_characters
-mov bx, new_line
-call print_characters
-
-mov bx, prompt_text
-call print_characters
-
-mov bx, new_line
-call print_characters
-
-mov bx, prompt
-call print_characters
-
-jmp halt
-
-print_characters:
-	mov al, [bx]
-	cmp al, 0
-	je end
+.loop:
+	lodsb		; loads next chasracter in al
+	or al, al	; check is next character is null
+	jz .done
+	
+	mov ah, 0x0e
 	int 0x10
-	inc bx
-	jmp print_characters
-end:
+	jmp .loop
+
+.done:
+	pop ax
+	pop si
 	ret
+	
+main:
+	;setup data segment
+	mov ax, 0
+	mov ds, ax
+	mov es, ax
+	
+	; setup stack segment
+	mov ss, ax
+	mov sp, 0x7c00	; stack grows downwards, set to start of app
 
-halt:
-	jmp $
+	; call hello world string
+	mov si, hello_world
+	call puts
 
-message: db 'Welcome to Test-OS!', 0
-line2: db 'This is a test of writing text on a new line.', 0
-prompt_text: db 'Enter your command:', 0
-prompt: db '$ ', 0
+	cli
+	hlt
 
-new_line: db 13, 10, 0
+.halt:
+	jmp .halt
+
+hello_world: db 'Hello World!', ENDL, 0
 
 times 510-($-$$) db 0
 dw 0xaa55
