@@ -1,4 +1,4 @@
-*.swp
+/**/*.swp
 /bin
-bootloader/bin
+bootloader/bin/*
 kernel/bin
