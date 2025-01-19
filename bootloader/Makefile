@@ -18,7 +18,7 @@ $(BIN)/$(TARGET_BIN):
 	$(ASM) $(SRC) -f bin -o ./$(BIN)/$(TARGET_BIN)
 
 run:
-	qemu-system-i386 -fda ./$(BIN)/$(TARGET_IMG)
+	qemu-system-i386 ./$(BIN)/$(TARGET_IMG)
 
 collect:
 	cp ./bootloader/$(BIN)/$(TARGET_IMG) ./$(BIN)

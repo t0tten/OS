@@ -17,3 +17,6 @@ run:
 clean:
 	rm -rf ./$(BIN)
 	$(foreach MODULE, $(MODULES), cd $(MODULE) && make clean -f Makefile; cd ..;)
+
+dependencies_arch:
+	sudo pacman -S $(shell cat dependencies.txt)

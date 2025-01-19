@@ -1,17 +1,22 @@
 [org 0x7C00]
-;bits 16
 
-main:
-	hlt
+print_text_to_screen:
 	mov ah, 0x0e
-	mov al, 'A'
-	int 0x10
+	mov bx, message
 
-.halt:
+print_characters:
+	mov al, [bx]
+	cmp al, 0
+	je halt
+	int 0x10
+	inc bx
+	jmp print_characters
+
+halt:
 	jmp $
 
 message:
-	db 'Hello', 0
+	db 'Welcome!', 0
 
 times 510-($-$$) db 0
-dw 0A55h
+dw 0xaa55
