@@ -15,8 +15,10 @@ build_floppy_image: collect_binaries
 	# MACOS - Comment out
 	cp ./bootloader/backup/empty_floppy_fat12.img $(BIN)/$(TARGET).img
 
-	cat $(BIN)/*.bin > $(BIN)/$(TARGET).bin
-	dd if=$(BIN)/$(TARGET).bin of=$(BIN)/$(TARGET).img conv=notrunc
+	#cat $(BIN)/*.bin > $(BIN)/$(TARGET).bin
+	#dd if=$(BIN)/$(TARGET).bin of=$(BIN)/$(TARGET).img conv=notrunc
+	dd if=$(BIN)/bootloader.bin of=$(BIN)/$(TARGET).img conv=notrunc
+	mcopy -i $(BIN)/$(TARGET).img $(BIN)/kernel.bin "::kernel.bin"
 
 collect_binaries: build_modules
 	if [ ! -d ./$(BIN) ]; then mkdir ./$(BIN); fi

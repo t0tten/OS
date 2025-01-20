@@ -14,9 +14,9 @@ bdb_bytes_per_sector:		dw 512
 bdb_sectors_per_cluster:	db 1
 bdb_reserved_sectors:		dw 1
 bdb_fat_count:			db 2
-bdb_dir_entry_counts:		dw 0xE0
+bdb_dir_entry_counts:		dw 0x0E0
 bdb_total_sectors:		dw 2880				; 2880 _* 512 = 1,44MB 
-bdb_media_descriptor_type:	db 0xF0				; F0 = 3,5" floppt disk
+bdb_media_descriptor_type:	db 0x0F0			; F0 = 3,5" floppt disk
 bdb_sectors_per_fat:		dw 9				; 9 sectors/fat
 bdb_sectors_per_track:		dw 18
 bdb_heads:			dw 2
@@ -39,7 +39,7 @@ start:
 	
 	; setup stack segment
 	mov ss, ax
-	mov sp, 0x7c00	; stack grows downwards, set to start of app
+	mov sp, 0x7C00	; stack grows downwards, set to start of app
 
 	; Could start at 07C0:0000 instead of 000:7C00
 	; This is to make sure we are at the correct location
@@ -51,10 +51,6 @@ start:
 	; Read something from floppy disk
 	; BIOS should set DL to drive number
 	mov [ebr_drive_number], dl
-	mov ax, 1				; LBA=1, second sector from disk	
-	mov cl, 1				; read 1 sector
-	mov bx, 0x7E00				; data should be after the bootloader
-	call disk_read
 
 	; show loading message
 	mov si, msg_loading
@@ -84,7 +80,7 @@ start:
 	push ax	
 
 	; compute size of root directory = 32 * number of entries / bytes per sector
-	mov ax, [bdb_sectors_per_fat]
+	mov ax, [bdb_dir_entry_counts]
 	shl ax, 5				; number of entries * 32
 	xor dx, dx				
 	div word [bdb_bytes_per_sector]		; ax / bytes per sector
@@ -103,7 +99,7 @@ start:
 	call disk_read
 
 	; Search for kernel.bin file
-	xor dx, dx				; count number of entries checked
+	xor  bx, bx ;				; count number of entries checked
 	mov di, buffer				; current directory entry, filename is first entry
 
 .search_kernel:
@@ -119,7 +115,7 @@ start:
 	cmp bx, [bdb_dir_entry_counts]
 	jl .search_kernel			; jump less
 	
-	jmp kernel_not_found
+	jmp kernel_not_found_error
 
 .found_kernel:
 	; di should still have the address to the entry	
@@ -206,7 +202,7 @@ floppy_error:
 	call puts
 	jmp wait_key_and_reboot
 
-kernel_not_found:
+kernel_not_found_error:
 	mov si, msg_kernel_not_found
 	call puts
 	jmp wait_key_and_reboot
