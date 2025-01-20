@@ -3,3 +3,4 @@
 .*.swo
 bin
 **/bin
+.DS_Store
