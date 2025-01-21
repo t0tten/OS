@@ -1,22 +1,14 @@
-ASM=nasm
-BIN=bin
+SUB_DIRS=bootloader entry
 
-SRC=bootloader.asm
+all: build_modules
 
-TARGET=bootloader
-TARGET_BIN=$(TARGET).bin
+build_modules:
+	$(foreach SUB_DIR, $(SUB_DIRS), cd $(SUB_DIR) && make -f Makefile; cd ..;)
 
-all: $(BIN)/$(TARGET_BIN)
-
-$(BIN)/$(TARGET_BIN):
-	if [ ! -d ./$(BIN) ]; then mkdir ./$(BIN); fi
-	$(ASM) $(SRC) -f bin -o ./$(BIN)/$(TARGET_BIN)
-
-run:
-	qemu-system-i386 ./$(BIN)/$(TARGET_BIN)
-
-collect:
-	cp ./bootloader/$(BIN)/$(TARGET_BIN) ./$(BIN)
+collect: build_modules
+	if [ ! -d ./bin ]; then mkdir ./bin; fi
+	$(foreach SUB_DIR, $(SUB_DIRS), make collect -f ./$(SUB_DIR)/Makefile;)
 
 clean:
-	rm -rf ./$(BIN)
+	$(foreach SUB_DIR, $(SUB_DIRS), cd $(SUB_DIR) && make clean -f Makefile; cd ..;)
+	rm -rf ./bin

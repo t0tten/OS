@@ -12,8 +12,9 @@ $(BIN)/$(TARGET_BIN):
 	if [ ! -d ./$(BIN) ]; then mkdir ./$(BIN); fi
 	$(ASM) $(SRC) -f bin -o ./$(BIN)/$(TARGET_BIN)
 
-collect:
+collect_subdir:
 	cp ./kernel/$(BIN)/$(TARGET_BIN) ./$(BIN)
+collect:
 
 clean:
 	rm -rf ./$(BIN)

@@ -5,10 +5,7 @@ TARGET=operating-system
 
 all: build_floppy_image
 
-build_modules:
-	$(foreach MODULE, $(MODULES), cd $(MODULE) && make -f Makefile; cd ..;)
-
-build_floppy_image: collect_binaries
+build_floppy_image: collect_subdirs
 	# LINUX - Comment out
 	#dd if=/dev/zero of=$(BIN)/$(TARGET).img bs=512 count=2880 # Empty floppy disk
 	#mkfs.fat -F 12 -n "NBOS" $(BIN)/$(TARGET).img
@@ -18,11 +15,17 @@ build_floppy_image: collect_binaries
 	#cat $(BIN)/*.bin > $(BIN)/$(TARGET).bin
 	#dd if=$(BIN)/$(TARGET).bin of=$(BIN)/$(TARGET).img conv=notrunc
 	dd if=$(BIN)/bootloader.bin of=$(BIN)/$(TARGET).img conv=notrunc
-	mcopy -i $(BIN)/$(TARGET).img $(BIN)/kernel.bin "::kernel.bin"
+	mcopy -i $(BIN)/$(TARGET).img $(BIN)/entry.bin "::entry.bin"
 
-collect_binaries: build_modules
+collect_subdirs: collect
+	cp $(foreach MODULE, $(MODULES), ./$(MODULE)/bin/*.bin) $(BIN)/
+
+collect: build_modules
 	if [ ! -d ./$(BIN) ]; then mkdir ./$(BIN); fi
-	$(foreach MODULE, $(MODULES), make collect -f ./$(MODULE)/Makefile;)
+	$(foreach MODULE, $(MODULES), cd $(MODULE) && make collect -f ./Makefile; cd ..;)
+
+build_modules:
+	$(foreach MODULE, $(MODULES), cd $(MODULE) && make -f Makefile; cd ..;)
 
 run:
 	qemu-system-i386 -fda $(wildcard $(BIN)/*.img)
